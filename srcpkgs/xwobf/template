@@ -1,0 +1,26 @@
+# Template file for 'xwobf'
+# Currently not PR'able due to no release tags
+# TO DO: ask original author to make a release tag
+pkgname=xwobf
+version=0.0
+revision=1
+_commit=4ff96e34a155b32336c65d301f88b561b9450b82
+wrksrc=xwobf-${_commit}
+build_style=gnu-makefile
+hostmakedepends="pkg-config"
+makedepends="libxcb-devel libmagick-devel"
+short_desc="Screenshot your desktop and obscure visible windows"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="MIT"
+homepage="https://github.com/glindste/xwobf"
+distfiles="https://github.com/glindste/xwobf/archive/${_commit}.tar.gz"
+checksum=fdbf02a69573f67e442bf4514ea1d08fedfb45a9d85bca93aa17b3627f53572d
+
+pre_build() {
+        CFLAGS="$(pkg-config --cflags xcb ImageMagick)"
+        LIBS="$(pkg-config --libs xcb ImageMagick)"
+}
+
+post_install() {
+        vlicense LICENSE
+}
