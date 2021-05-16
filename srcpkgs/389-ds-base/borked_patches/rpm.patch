@@ -1,0 +1,34 @@
+--- /dev/fd/63	2021-05-17 20:27:19.687920652 +0100
++++ masterdir/builddir/389-ds-base-389-ds-base-2.0.4/rpm/389-ds-base.spec.in	2021-04-07 08:46:28.000000000 +0100
+@@ -471,7 +471,7 @@
+ fi
+ 
+ # reload to pick up any changes to systemd files
+-/bin/sv reload >$output 2>&1 || :
++/bin/systemctl daemon-reload >$output 2>&1 || :
+ 
+ # find all instances
+ instances="" # instances that require a restart after upgrade
+@@ -507,7 +507,7 @@
+     basename=`basename $dir`
+     inst="%{pkgname}@`echo $basename | sed -e 's/slapd-//g'`"
+     echo found instance $inst - getting status  >> $output 2>&1 || :
+-    if /bin/sv -q is-active $inst ; then
++    if /bin/systemctl -q is-active $inst ; then
+        echo instance $inst is running >> $output 2>&1 || :
+        instances="$instances $inst"
+     else
+@@ -523,11 +523,11 @@
+     echo shutting down all instances . . . >> $output 2>&1 || :
+     for inst in $instances ; do
+         echo stopping instance $inst >> $output 2>&1 || :
+-        /bin/sv stop $inst >> $output 2>&1 || :
++        /bin/systemctl stop $inst >> $output 2>&1 || :
+     done
+     for inst in $instances ; do
+         echo starting instance $inst >> $output 2>&1 || :
+-        /bin/sv start $inst >> $output 2>&1 || :
++        /bin/systemctl start $inst >> $output 2>&1 || :
+     done
+ fi
+ 

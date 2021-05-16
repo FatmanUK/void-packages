@@ -1,0 +1,44 @@
+--- /dev/fd/63	2021-05-17 21:07:39.077277678 +0100
++++ masterdir/builddir/389-ds-base-389-ds-base-2.0.4/src/lib389/lib389/cli_ctl/cockpit.py	2021-04-07 08:46:28.000000000 +0100
+@@ -25,9 +25,9 @@
+     if not cockpit_present():
+         raise ValueError("The 'cockpit' package is not installed on this system")
+ 
+-    ENABLE_CMD = ['sudo', 'sv', 'enable', '--now', 'cockpit.socket']
++    ENABLE_CMD = ['sudo', 'systemctl', 'enable', '--now', 'cockpit.socket']
+     try:
+-        x=1
++        subprocess.run(ENABLE_CMD)
+     except subprocess.CalledProcessError as e:
+         raise ValueError(f"Failed to enable cockpit socket.  Error {str(e)}")
+ 
+@@ -43,7 +43,7 @@
+     if args.zone is not None:
+         OPEN_CMD.append(f' --zone={args.zone}')
+     try:
+-        x=1
++        subprocess.run(OPEN_CMD)
+     except subprocess.CalledProcessError as e:
+         raise ValueError(f'Failed to open firewall for service "cockpit"  Error {str(e)}')
+ 
+@@ -55,9 +55,9 @@
+     if not cockpit_present():
+         raise ValueError("The 'cockpit' package is not installed on this system")
+ 
+-    DISABLE_CMD = ['sudo', 'sv', 'disable', '--now', 'cockpit.socket']
++    DISABLE_CMD = ['sudo', 'systemctl', 'disable', '--now', 'cockpit.socket']
+     try:
+-        x=1
++        subprocess.run(DISABLE_CMD)
+     except subprocess.CalledProcessError as e:
+         raise ValueError(f"Failed to disable cockpit socket.  Error {str(e)}")
+ 
+@@ -71,7 +71,7 @@
+ 
+     CLOSE_CMD = ['sudo', 'firewall-cmd', '--remove-service=cockpit', '--permanent']
+     try:
+-        x=1
++        subprocess.run(CLOSE_CMD)
+     except subprocess.CalledProcessError as e:
+         raise ValueError(f'Failed to remove "cockpit" service from firewall.  Error {str(e)}')
+ 

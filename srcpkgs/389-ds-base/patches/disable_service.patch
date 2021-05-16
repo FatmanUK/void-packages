@@ -1,0 +1,11 @@
+--- src/lib389/lib389/instance/remove.py	2021-04-07 08:46:28.000000000 +0100
++++ src/lib389/lib389/instance/remove.py	2021-05-17 20:58:48.710585234 +0100
+@@ -100,7 +100,7 @@
+         # Remove the systemd symlink
+         _log.debug("Removing the systemd symlink")
+ 
+-        result = subprocess.run(["systemctl", "disable", "dirsrv@{}".format(dirsrv.serverid)],
++        result = subprocess.run(["rm", "/var/service/dirsrv-{}".format(dirsrv.serverid)],
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+         args = ' '.join(ensure_list_str(result.args))
+         stdout = ensure_str(result.stdout)

@@ -1,0 +1,33 @@
+--- src/lib389/lib389/__init__.py	2021-04-07 08:46:28.000000000 +0100
++++ src/lib389/lib389/__init__.py	2021-05-17 21:16:11.716899687 +0100
+@@ -1072,7 +1072,7 @@
+         if self.with_systemd():
+             self.log.debug("systemd status -> True")
+             # Do systemd things here ...
+-            subprocess.check_output(["systemctl", "start", "dirsrv@%s" % self.serverid], stderr=subprocess.STDOUT)
++            subprocess.check_output(["sv", "start", "dirsrv-%s" % self.serverid, "2>/dev/null"], stderr=subprocess.STDOUT)
+         else:
+             self.log.debug("systemd status -> False")
+             # Start the process.
+@@ -1141,7 +1141,7 @@
+         if self.with_systemd():
+             self.log.debug("systemd status -> True")
+             # Do systemd things here ...
+-            subprocess.check_output(["systemctl", "stop", "dirsrv@%s" % self.serverid], stderr=subprocess.STDOUT)
++            subprocess.check_output(["sv", "stop", "dirsrv-%s" % self.serverid, "2>/dev/null"], stderr=subprocess.STDOUT)
+         else:
+             self.log.debug("systemd status -> False")
+             # TODO: Make the pid path in the files things
+@@ -1168,9 +1168,9 @@
+         if self.with_systemd():
+             self.log.debug("systemd status -> True")
+             # Do systemd things here ...
+-            rc = subprocess.call(["systemctl",
+-                                  "is-active", "--quiet",
+-                                  "dirsrv@%s" % self.serverid])
++            rc = subprocess.call(["sv",
++                                  "stat",
++                                  "dirsrv-%s" % self.serverid, "2>/dev/null"])
+             if rc == 0:
+                 return True
+                 # We don't reset the state here because we don't know what state

@@ -1,0 +1,61 @@
+--- /dev/fd/63	2021-05-17 21:21:11.744438077 +0100
++++ masterdir/builddir/389-ds-base-389-ds-base-2.0.4/dirsrvtests/tests/suites/basic/basic_test.py	2021-04-07 08:46:28.000000000 +0100
+@@ -825,8 +825,8 @@
+     log.info('test_basic_referrals: PASSED')
+ 
+ 
+-def test_basic_sv(topology_st, import_example_ldif):
+-    """Tests sv/lib389 can stop and start the server.
++def test_basic_systemctl(topology_st, import_example_ldif):
++    """Tests systemctl/lib389 can stop and start the server.
+ 
+     :id: a92a7438-ecfa-4583-a89c-5fbfc0220b69
+ 
+@@ -836,9 +836,9 @@
+          1. Stop the server.
+          2. Start the server.
+          3. Stop the server, break the dse.ldif and dse.ldif.bak, so a start fails.
+-         4. Verify that sv detects the failed start.
++         4. Verify that systemctl detects the failed start.
+          5. Fix the dse.ldif, and make sure the server starts up.
+-         6. Verify sv correctly identifies the successful start.
++         6. Verify systemctl correctly identifies the successful start.
+ 
+     :expectedresults:
+          1. Server should be stopped.
+@@ -849,7 +849,7 @@
+          6. Systemctl should be able to detect the successful start.
+     """
+ 
+-    log.info('Running test_basic_sv...')
++    log.info('Running test_basic_systemctl...')
+ 
+     config_dir = topology_st.standalone.get_config_dir()
+ 
+@@ -869,7 +869,7 @@
+ 
+     #
+     # Stop the server, break the dse.ldif so a start fails,
+-    # and verify that sv detects the failed start
++    # and verify that systemctl detects the failed start
+     #
+     log.info('Stopping the server...')
+     topology_st.standalone.stop()
+@@ -892,7 +892,7 @@
+ 
+     #
+     # Fix the dse.ldif, and make sure the server starts up,
+-    # and sv correctly identifies the successful start
++    # and systemctl correctly identifies the successful start
+     #
+     shutil.copy(config_dir + '/dse.ldif.correct', config_dir + '/dse.ldif')
+     log.info('Starting the server with good dse.ldif...')
+@@ -901,7 +901,7 @@
+     assert (topology_st.standalone.status())
+     log.info('Server started after fixing dse.ldif.')
+ 
+-    log.info('test_basic_sv: PASSED')
++    log.info('test_basic_systemctl: PASSED')
+ 
+ 
+ def test_basic_ldapagent(topology_st, import_example_ldif):

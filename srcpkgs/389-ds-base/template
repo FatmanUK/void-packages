@@ -1,0 +1,73 @@
+# Template file for '389-ds-base'
+pkgname=389-ds-base
+version=2.0.4
+revision=1
+wrksrc=$pkgname-$pkgname-$version
+build_style=gnu-configure
+configure_args="--enable-debug --prefix=/usr --disable-dependency-tracking --enable-asan --with-openldap --with-selinux --without-systemd --without-journald --enable-cmocka"
+hostmakedepends="autoconf automake libtool pkg-config rsync python3-pip python3"
+makedepends="libltdl-devel cracklib-devel pam-devel libevent-devel nspr-devel nss-devel db-devel libsasl-devel icu-devel net-snmp-devel mit-krb5-devel pcre-devel libnl-devel libsensors-devel pciutils-devel python3-devel cmocka-devel libsanitizer-devel"
+depends="python3-pip"
+short_desc="Highly usable, fully featured, reliable and secure LDAP server"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="GPL-3.0-or-later"
+homepage="https://www.port389.org/"
+distfiles="https://github.com/389ds/$pkgname/archive/refs/tags/$pkgname-$version.tar.gz"
+checksum=3695bf81c5c194fd6848315b54913c7450a61fec86aa7bcb5646f20ac4201edf
+system_accounts="dirsrv:389"
+
+pre_configure() {
+	autoreconf -fiv
+}
+
+post_build() {
+	pip3 install -r src/lib389/requirements.txt
+	make lib389
+}
+
+post_install() {
+	make install
+	make lib389-install
+
+	vbin src/lib389/cli/dsconf
+	vbin src/lib389/cli/dscontainer
+	vbin src/lib389/cli/dscreate
+	vbin src/lib389/cli/dsctl
+	vbin src/lib389/cli/dsidm
+
+	vman man/man5/template-initconfig.5
+	vman man/man5/certmap.conf.5
+	vman man/man5/slapd-collations.conf.5
+	vman man/man5/dirsrv.5
+	vman man/man5/dirsrv.systemd.5
+	vman man/man5/99user.ldif.5
+	vman man/man8/ns-slapd.8
+	vman man/man1/dbscan.1
+	vman man/man1/ds-logpipe.py.1
+	vman man/man1/infadd.1
+	vman man/man1/ds-replcheck.1
+	vman man/man1/pwdhash.1
+	vman man/man1/dsktune.1
+	vman man/man1/logconv.pl.1
+	vman man/man1/ldif.1
+	vman man/man1/rsearch.1
+	vman man/man1/ldclt.1
+	vman man/man1/ldap-agent.1
+	vman man/man1/mmldif.1
+
+	vman src/lib389/man/dsidm.8
+	vman src/lib389/man/dsctl.8
+	vman src/lib389/man/dscreate.8
+	vman src/lib389/man/dsconf.8
+	vman src/lib389/man/openldap_to_ds.8
+
+	mkdir -p ${DESTDIR}/$py3_sitelib
+	vcopy src/lib389/lib389 $py3_sitelib
+	vcopy src/lib389/lib389.egg-info $py3_sitelib
+	vsconf ${FILESDIR}/example.inf
+	vsv dirsrv
+
+	rm -r ${DESTDIR}/dirsrv@.service.d
+	pip3 install -r src/lib389/requirements.txt
+	pip3 install ldif selinux
+}

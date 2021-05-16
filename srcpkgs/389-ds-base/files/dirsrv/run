@@ -1,0 +1,4 @@
+#!/bin/sh
+install -d -m0755 -oroot -groot /run/dirsrv
+[ -r conf ] && . ./conf
+exec chpst -u dirsrv ns-slapd ${OPTS:- -D /etc/dirsrv}

@@ -1,0 +1,11 @@
+--- /dev/fd/63	2021-05-17 21:34:02.466388736 +0100
++++ masterdir/builddir/389-ds-base-389-ds-base-2.0.4/dirsrvtests/tests/suites/setup_ds/remove_test.py	2021-04-07 08:46:28.000000000 +0100
+@@ -62,7 +62,7 @@
+         assert not os.path.exists(path)
+ 
+     try:
+-        subprocess.check_output(['sv', 'stat', 'dirsrv-{}'.format(inst.serverid)], encoding='utf-8')
++        subprocess.check_output(['systemctl', 'is-enabled', 'dirsrv@{}'.format(inst.serverid)], encoding='utf-8')
+     except subprocess.CalledProcessError as ex:
+         assert "disabled" in ex.output
+ 

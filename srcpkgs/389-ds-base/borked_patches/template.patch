@@ -1,0 +1,13 @@
+--- /dev/fd/63	2021-05-17 20:40:26.680956671 +0100
++++ masterdir/builddir/389-ds-base-389-ds-base-2.0.4/wrappers/systemd.template.service.custom.conf.in	2021-04-07 08:46:28.000000000 +0100
+@@ -9,8 +9,8 @@
+ # See systemd.service(5) and systemd.exec(5) for the respective documentation.
+ #
+ # After updating the service configuration, do not forget to apply the changes:
+-# - reload systemd configuration: sv reload
+-# - restart the service: sv restart @package_name@@<instance>.service
++# - reload systemd configuration: systemctl daemon-reload
++# - restart the service: systemctl restart @package_name@@<instance>.service
+ 
+ [Service]
+ TimeoutStartSec=0
