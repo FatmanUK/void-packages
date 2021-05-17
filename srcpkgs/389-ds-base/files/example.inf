@@ -1,10 +1,15 @@
 [general]
 config_version = 2
+strict_host_checking = False
 
 [slapd]
-root_password = YOUR_ADMIN_PASSWORD_HERE
+instance_name = dirsrv
+root_password = Directory_Manager_Password
+self_sign_cert = True
+self_sign_cert_valid_months = 24
 
 [backend-userroot]
+create_suffix_entry = True
+require_index = False
 sample_entries = yes
 suffix = dc=example,dc=com
-

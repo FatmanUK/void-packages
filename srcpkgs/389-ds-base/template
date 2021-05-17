@@ -4,7 +4,7 @@ version=2.0.4
 revision=1
 wrksrc=$pkgname-$pkgname-$version
 build_style=gnu-configure
-configure_args="--enable-debug --prefix=/usr --disable-dependency-tracking --enable-asan --with-openldap --without-selinux --without-systemd --without-journald --enable-cmocka"
+configure_args="--enable-debug --prefix=/usr --disable-dependency-tracking --enable-asan --without-openldap --without-selinux --without-systemd --without-journald --enable-cmocka"
 hostmakedepends="autoconf automake libtool pkg-config rsync python3-pip python3"
 makedepends="libltdl-devel cracklib-devel pam-devel libevent-devel nspr-devel nss-devel db-devel libsasl-devel icu-devel net-snmp-devel mit-krb5-devel pcre-devel libnl-devel libsensors-devel pciutils-devel python3-devel cmocka-devel libsanitizer-devel"
 depends="python3-pip"
@@ -77,5 +77,6 @@ post_install() {
 	install -d /usr/include/dirsrv -m 0775 -o dirsrv -g dirsrv
 	install -d /usr/share/dirsrv -m 0775 -o dirsrv -g dirsrv
 	install -d /var/log/dirsrv -m 0775 -o dirsrv -g dirsrv
+	install -d /var/run/dirsrv -m 0775 -o dirsrv -g dirsrv
 
 }
