@@ -1,33 +1,203 @@
---- src/lib389/lib389/__init__.py	2021-04-07 08:46:28.000000000 +0100
-+++ src/lib389/lib389/__init__.py	2021-05-17 21:16:11.716899687 +0100
-@@ -1072,7 +1072,7 @@
-         if self.with_systemd():
-             self.log.debug("systemd status -> True")
-             # Do systemd things here ...
--            subprocess.check_output(["systemctl", "start", "dirsrv@%s" % self.serverid], stderr=subprocess.STDOUT)
-+            subprocess.check_output(["sv", "start", "dirsrv-%s" % self.serverid, "2>/dev/null"], stderr=subprocess.STDOUT)
-         else:
-             self.log.debug("systemd status -> False")
-             # Start the process.
-@@ -1141,7 +1141,7 @@
-         if self.with_systemd():
-             self.log.debug("systemd status -> True")
-             # Do systemd things here ...
--            subprocess.check_output(["systemctl", "stop", "dirsrv@%s" % self.serverid], stderr=subprocess.STDOUT)
-+            subprocess.check_output(["sv", "stop", "dirsrv-%s" % self.serverid, "2>/dev/null"], stderr=subprocess.STDOUT)
-         else:
-             self.log.debug("systemd status -> False")
-             # TODO: Make the pid path in the files things
-@@ -1168,9 +1168,9 @@
-         if self.with_systemd():
-             self.log.debug("systemd status -> True")
-             # Do systemd things here ...
--            rc = subprocess.call(["systemctl",
--                                  "is-active", "--quiet",
--                                  "dirsrv@%s" % self.serverid])
-+            rc = subprocess.call(["sv",
-+                                  "stat",
-+                                  "dirsrv-%s" % self.serverid, "2>/dev/null"])
-             if rc == 0:
-                 return True
-                 # We don't reset the state here because we don't know what state
+--- /home/fatman/void-packages/masterdir/builddir/389-ds-base-389-ds-base-2.0.4/src/lib389/lib389/__init__.py	2021-05-17 23:03:42.600942858 +0100
++++ /usr/lib/python3.9/site-packages/lib389/__init__.py	2021-05-17 23:15:38.386548820 +0100
+@@ -1069,52 +1069,47 @@
+         if self.status() is True:
+             return
+ 
+-        if self.with_systemd():
+-            self.log.debug("systemd status -> True")
+-            # Do systemd things here ...
+-            subprocess.check_output(["sv", "start", "dirsrv-%s" % self.serverid, "2>/dev/null"], stderr=subprocess.STDOUT)
+-        else:
+-            self.log.debug("systemd status -> False")
+-            # Start the process.
+-            # Wait for it to terminate
+-            # This means the server is probably ready to go ....
+-            env = {}
+-            if self.has_asan():
+-                self.log.warning("WARNING: Starting instance with ASAN options. This is probably not what you want. Please contact support.")
+-                self.log.info("INFO: ASAN options will be copied from your environment")
+-                env['ASAN_SYMBOLIZER_PATH'] = "/usr/bin/llvm-symbolizer"
+-                env['ASAN_OPTIONS'] = "symbolize=1 detect_deadlocks=1 log_path=%s/ns-slapd-%s.asan" % (self.ds_paths.run_dir, self.serverid)
+-                env.update(os.environ)
+-            output = None
+-            try:
+-                cmd = ["%s/ns-slapd" % self.get_sbin_dir(),
+-                        "-D",
+-                        self.ds_paths.config_dir,
+-                        "-i",
+-                        self.ds_paths.pid_file],
+-                self.log.debug("DEBUG: starting with %s" % cmd)
+-                output = subprocess.check_output(*cmd, env=env, stderr=subprocess.STDOUT)
+-            except subprocess.CalledProcessError:
+-                self.log.error('Failed to start ns-slapd: "%s"' % output)
+-                raise ValueError('Failed to start DS')
+-            count = timeout
++        self.log.debug("systemd status -> False")
++        # Start the process.
++        # Wait for it to terminate
++        # This means the server is probably ready to go ....
++        env = {}
++        if self.has_asan():
++            self.log.warning("WARNING: Starting instance with ASAN options. This is probably not what you want. Please contact support.")
++            self.log.info("INFO: ASAN options will be copied from your environment")
++            env['ASAN_SYMBOLIZER_PATH'] = "/usr/bin/llvm-symbolizer"
++            env['ASAN_OPTIONS'] = "symbolize=1 detect_deadlocks=1 log_path=%s/ns-slapd-%s.asan" % (self.ds_paths.run_dir, self.serverid)
++            env.update(os.environ)
++        output = None
++        try:
++            cmd = ["%s/ns-slapd" % self.get_sbin_dir(),
++                    "-D",
++                    self.ds_paths.config_dir,
++                    "-i",
++                    self.ds_paths.pid_file],
++            self.log.debug("DEBUG: starting with %s" % cmd)
++            output = subprocess.check_output(*cmd, env=env, stderr=subprocess.STDOUT)
++        except subprocess.CalledProcessError:
++            self.log.error('Failed to start ns-slapd: "%s"' % output)
++            raise ValueError('Failed to start DS')
++        count = timeout
++        pid = pid_from_file(self.ds_paths.pid_file)
++        while (pid is None) and count > 0:
++            count -= 1
++            time.sleep(1)
++            pid = pid_from_file(self.ds_paths.pid_file)
++        if pid == 0 or pid is None:
++            raise ValueError('Failed to start DS')
++        # Wait
++        while not pid_exists(pid) and count > 0:
++            # It looks like DS changes the value in here at some point ...
++            # It's probably a DS bug, but if we "keep checking" the file, eventually
++            # we get the main server pid, and it's ready to go.
+             pid = pid_from_file(self.ds_paths.pid_file)
+-            while (pid is None) and count > 0:
+-                count -= 1
+-                time.sleep(1)
+-                pid = pid_from_file(self.ds_paths.pid_file)
+-            if pid == 0 or pid is None:
+-                raise ValueError('Failed to start DS')
+-            # Wait
+-            while not pid_exists(pid) and count > 0:
+-                # It looks like DS changes the value in here at some point ...
+-                # It's probably a DS bug, but if we "keep checking" the file, eventually
+-                # we get the main server pid, and it's ready to go.
+-                pid = pid_from_file(self.ds_paths.pid_file)
+-                time.sleep(1)
+-                count -= 1
+-            if not pid_exists(pid):
+-                raise ValueError("Failed to start DS")
++            time.sleep(1)
++            count -= 1
++        if not pid_exists(pid):
++            raise ValueError("Failed to start DS")
+         if post_open:
+             self.open()
+ 
+@@ -1138,25 +1133,20 @@
+         if self.status() is False:
+             return
+ 
+-        if self.with_systemd():
+-            self.log.debug("systemd status -> True")
+-            # Do systemd things here ...
+-            subprocess.check_output(["sv", "stop", "dirsrv-%s" % self.serverid, "2>/dev/null"], stderr=subprocess.STDOUT)
+-        else:
+-            self.log.debug("systemd status -> False")
+-            # TODO: Make the pid path in the files things
+-            # TODO: use the status call instead!!!!
+-            count = timeout
+-            pid = pid_from_file(self.ds_paths.pid_file)
+-            if pid == 0 or pid is None:
+-                raise ValueError("Failed to stop DS")
+-            os.kill(pid, signal.SIGTERM)
+-            # Wait
+-            while pid_exists(pid) and count > 0:
+-                time.sleep(1)
+-                count -= 1
+-            if pid_exists(pid):
+-                os.kill(pid, signal.SIGKILL)
++        self.log.debug("systemd status -> False")
++        # TODO: Make the pid path in the files things
++        # TODO: use the status call instead!!!!
++        count = timeout
++        pid = pid_from_file(self.ds_paths.pid_file)
++        if pid == 0 or pid is None:
++            raise ValueError("Failed to stop DS")
++        os.kill(pid, signal.SIGTERM)
++        # Wait
++        while pid_exists(pid) and count > 0:
++            time.sleep(1)
++            count -= 1
++        if pid_exists(pid):
++            os.kill(pid, signal.SIGKILL)
+         self.state = DIRSRV_STATE_OFFLINE
+ 
+     def status(self):
+@@ -1165,39 +1155,25 @@
+ 
+         Will update the self.state parameter.
+         """
+-        if self.with_systemd():
+-            self.log.debug("systemd status -> True")
+-            # Do systemd things here ...
+-            rc = subprocess.call(["sv",
+-                                  "stat",
+-                                  "dirsrv-%s" % self.serverid, "2>/dev/null"])
+-            if rc == 0:
+-                return True
+-                # We don't reset the state here because we don't know what state
+-                # we are in re shutdown. The state is for us internally anyway.
+-                # self.state = DIRSRV_STATE_RUNNING
++        self.log.debug("systemd status -> False")
++        pid = pid_from_file(self.ds_paths.pid_file)
++        self.log.debug("pid file %s -> %s" % (self.ds_paths.pid_file, pid))
++        if pid is None:
++            self.log.debug("No pidfile found for %s", self.serverid)
++            # No pidfile yet ...
+             self.state = DIRSRV_STATE_OFFLINE
+             return False
+-        else:
+-            self.log.debug("systemd status -> False")
+-            pid = pid_from_file(self.ds_paths.pid_file)
+-            self.log.debug("pid file %s -> %s" % (self.ds_paths.pid_file, pid))
+-            if pid is None:
+-                self.log.debug("No pidfile found for %s", self.serverid)
+-                # No pidfile yet ...
+-                self.state = DIRSRV_STATE_OFFLINE
+-                return False
+-            if pid == 0:
+-                self.log.debug("Pid of 0 not valid for %s", self.serverid)
+-                self.state = DIRSRV_STATE_OFFLINE
+-                raise ValueError
+-            # Wait
+-            if not pid_exists(pid):
+-                self.log.debug("Pid of %s is not running for %s", pid, self.serverid)
+-                self.state = DIRSRV_STATE_OFFLINE
+-                return False
+-            self.log.debug("Pid of %s for %s and running", pid, self.serverid)
+-            return True
++        if pid == 0:
++            self.log.debug("Pid of 0 not valid for %s", self.serverid)
++            self.state = DIRSRV_STATE_OFFLINE
++            raise ValueError
++        # Wait
++        if not pid_exists(pid):
++            self.log.debug("Pid of %s is not running for %s", pid, self.serverid)
++            self.state = DIRSRV_STATE_OFFLINE
++            return False
++        self.log.debug("Pid of %s for %s and running", pid, self.serverid)
++        return True
+ 
+     def restart(self, timeout=120, post_open=True):
+         '''
+@@ -1656,9 +1632,7 @@
+         return self.ds_paths.asan_enabled
+ 
+     def with_systemd(self):
+-        if self.systemd_override is not None:
+-            return self.systemd_override
+-        return self.ds_paths.with_systemd
++        return False
+ 
+     def get_server_tls_subject(self):
+         """ Get the servers TLS subject line for enrollment purposes.
