@@ -1,10 +1,10 @@
 # Template file for 'inspircd'
 pkgname=inspircd
 version=3.8.1
-revision=2
+revision=3
 build_style=gnu-makefile
 hostmakedepends="perl pkg-config"
-makedepends="geoip-devel openssl-devel sqlite-devel gnutls-devel"
+makedepends="geoip-devel openssl-devel sqlite-devel gnutls-devel libmariadbclient-devel"
 short_desc="Modular Internet Relay Chat server"
 maintainer="Alexander Gehrke <void@qwertyuiop.de>"
 license="GPL-2.0-only"
@@ -26,7 +26,7 @@ pre_configure() {
 }
 
 do_configure() {
-	./configure --enable-extras=m_ssl_openssl.cpp,m_regex_posix.cpp,m_sqlite3.cpp
+	./configure --enable-extras=m_ssl_openssl.cpp,m_regex_posix.cpp,m_sqlite3.cpp,m_mysql.cpp
 	./configure \
 		--prefix=/usr \
 		--config-dir=/etc/inspircd \
