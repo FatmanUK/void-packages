@@ -1,9 +1,9 @@
 # Template file for 'qcad'
 # Since this is a port of a Windows program, it wants all the files in one place eg. /opt/qcad. Yeah, that sucks but it's a really good drawing program IMO. :)
 pkgname=qcad
-version=3.24.3.1
+version=3.26.4.2
 revision=1
-_commit=682e4991acd160cf556570a5b1da391ae75171d0
+_commit=1325d80c1353fe7c15ad1100ef45d9b8c13fd370
 wrksrc=qcad-${_commit}
 build_style=qmake
 configure_args="-r CONFIG+=ractivated"
@@ -16,7 +16,7 @@ maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
 license="GPL-3.0-or-later,LGPL-2.0-or-later,Public Domain,Zlib,MIT,BSD-2-Clause,CC-BY-3.0"
 homepage="https://www.qcad.org"
 distfiles="https://github.com/qcad/qcad/archive/${_commit}.tar.gz"
-checksum=910fef265349bf93ba90e8015195e9fda3c87615a8db56a7cc0e978ef44e142e
+checksum=b5a6d030ca00c6b271beed357994077e798156bac6ddef9dcb2d26a975862c3e
 
 post_build() {
 	/usr/bin/doxygen qcad.doxyfile
