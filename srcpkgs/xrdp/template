@@ -1,0 +1,30 @@
+# Template file for 'xrdp'
+pkgname=xrdp
+version=0.9.16
+revision=1
+_commit=a4c7ee077c049202d73f82f518b2de958d722890
+build_style=gnu-configure
+configure_args="--enable-fuse --enable-painter --enable-rfxcodec"
+wrksrc=xrdp-${_commit}
+hostmakedepends="which git automake autoconf libtool gcc make pkg-config yasm"
+makedepends="libressl-devel pam-devel libX11-devel libXfixes-devel libXrandr-devel fuse-devel"
+short_desc="Graphical login server for RDP clients"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="Apache-2.0"
+homepage="https://www.xrdp.org/"
+distfiles="https://github.com/neutrinolabs/xrdp/archive/${_commit}.tar.gz"
+checksum=b952dd2d155c844f0e41a50b93bd8529f72ff236a884d591fd8af02bc2b6b309
+
+do_configure() {
+	export PATH=/usr/bin
+	./bootstrap
+	./configure ${configure_args}
+}
+
+do_build() {
+	make
+}
+
+do_install() {
+	make install DESTDIR=${DESTDIR}
+}

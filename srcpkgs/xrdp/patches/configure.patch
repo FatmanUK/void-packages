@@ -1,0 +1,23 @@
+--- configure.ac	2021-04-30 12:57:55.000000000 +0100
++++ configure.ac	2021-07-03 22:52:15.425623622 +0100
+@@ -233,15 +233,12 @@
+     AC_CHECK_HEADER([security/pam_appl.h], [],
+       [AC_MSG_ERROR([please install libpam0g-dev or pam-devel])])
+   fi
+-  if test "x$enable_pam_config" = "x"; then
+-    PAM_RULES="auto"
++  enable_pam_config=arch
++  pam_config_file="$srcdir/instfiles/pam.d/xrdp-sesman.$enable_pam_config"
++  if test -f "$pam_config_file"; then
++    PAM_RULES="$enable_pam_config"
+   else
+-    pam_config_file="$srcdir/instfiles/pam.d/xrdp-sesman.$enable_pam_config"
+-    if test -f "$pam_config_file"; then
+-      PAM_RULES="$enable_pam_config"
+-    else
+-      AC_MSG_ERROR([PAM file "$pam_config_file" is not available])
+-    fi
++    AC_MSG_ERROR([PAM file "$pam_config_file" is not available])
+   fi
+ fi
+ 

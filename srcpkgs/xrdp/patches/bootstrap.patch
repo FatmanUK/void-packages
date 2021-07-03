@@ -1,0 +1,19 @@
+--- ./bootstrap	2021-04-30 12:57:55.000000000 +0100
++++ ./bootstrap	2021-07-03 22:13:31.086012575 +0100
+@@ -28,14 +28,7 @@
+   exit 1
+ fi
+ 
+-if ! test -f libpainter/configure.ac
+-then
+-  git submodule update --init libpainter
+-fi
+-
+-if ! test -f librfxcodec/configure.ac
+-then
+-  git submodule update --init librfxcodec
+-fi
++git clone https://github.com/neutrinolabs/librfxcodec.git librfxcodec
++git clone https://github.com/neutrinolabs/libpainter.git libpainter
+ 
+ autoreconf -fvi
