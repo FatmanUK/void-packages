@@ -1,0 +1,63 @@
+# Template file for 'qcad'
+# Since this is a port of a Windows program, it wants all the files in one place eg. /opt/qcad. Yeah, that sucks but it's a really good drawing program IMO. :)
+pkgname=qcad
+version=3.24.3.1
+revision=1
+_commit=682e4991acd160cf556570a5b1da391ae75171d0
+wrksrc=qcad-${_commit}
+build_style=qmake
+configure_args="-r CONFIG+=ractivated"
+make_build_target="release"
+hostmakedepends="gcc make doxygen"
+makedepends="libX11-devel libXext-devel libXrender-devel glu-devel freetype-devel fontconfig-devel gnutls-devel libdbus-c++-devel libSM-devel qt5-devel qt5-webkit-devel qt5-script-devel qt5-svg-devel qt5-xmlpatterns-devel qt5-tools-devel"
+depends="qt5"
+short_desc="QCAD - The Open Source 2D CAD"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="GPL-3.0-or-later,LGPL-2.0-or-later,Public Domain,Zlib,MIT,BSD-2-Clause,CC-BY-3.0"
+homepage="https://www.qcad.org"
+distfiles="https://github.com/qcad/qcad/archive/${_commit}.tar.gz"
+checksum=910fef265349bf93ba90e8015195e9fda3c87615a8db56a7cc0e978ef44e142e
+
+post_build() {
+	/usr/bin/doxygen qcad.doxyfile
+}
+
+do_install() {
+	VQCADDIR="/opt/qcad"
+	QCADDIR="${DESTDIR}${VQCADDIR}"
+	/usr/bin/mkdir -p "${QCADDIR}/usr/bin/qcad" "${DESTDIR}/usr/share/applications" "${QCADDIR}/usr/bin/qcad"
+	for DIR in examples fonts libraries linetypes patterns platforminputcontexts platforms plugins scripts themes support/doc/api
+	do
+		/usr/bin/cp -pr ${DIR} "${QCADDIR}"
+	done
+	vcopy "release/*.so" "${VQCADDIR}"
+	vcopy "release/qcad-bin" "${VQCADDIR}"
+	vcopy "merge" "${VQCADDIR}"
+	vcopy qcad.desktop /usr/share/applications
+	vman qcad.1
+	# This symlink makes the .desktop file work with dmenu.
+	ln -s /opt/qcad/qcad-bin "${QCADDIR}/usr/bin/qcad"
+	vlicense LICENSE.txt
+	vlicense lgpl.txt
+	vlicense gpl-3.0-exceptions.txt
+	vlicense cc-by-3.0.txt
+	vlicense fonts/hershey.readme
+	vlicense fonts/osifont_license.txt
+	vlicense fonts/qt/LICENSES.txt
+	vlicense src/3rdparty/dxflib/gpl-2.0greater.txt
+	vlicense src/3rdparty/opennurbs/readme.txt
+	vlicense src/3rdparty/spatialindexnavel/COPYING
+	vlicense src/3rdparty/stemmer/bsd-2.txt
+}
+
+qcad-devel_package() {
+	VQCADDIR="/opt/qcad-devel"
+#	QCADDIR="${DESTDIR}${VQCADDIR}"
+	short_desc+=" - development files"
+	depends="${sourcepkg}>=${version}_${revision}"
+	pkg_install() {
+#		/usr/bin/mkdir -p "${QCADDIR}"
+		vmkdir "${VQCADDIR}"
+		vcopy "release/*.a" "${VQCADDIR}"
+	}
+}
