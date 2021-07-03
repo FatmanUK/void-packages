@@ -1,0 +1,31 @@
+# Template file for 'xorgxrdp'
+pkgname=xorgxrdp
+version=0.2.16
+revision=1
+_commit=547eaf38711357de34501b760c0372d2a75de749
+wrksrc=xorgxrdp-${_commit}
+build_style=gnu-configure
+hostmakedepends="which git automake autoconf libtool gcc make pkg-config yasm"
+makedepends="xorg-server-devel xrdp"
+depends="xorg xrdp"
+short_desc="Modules to be used with xrdp and xorg"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="X11"
+homepage="http://www.xrdp.org"
+distfiles="https://github.com/neutrinolabs/xorgxrdp/archive/${_commit}.tar.gz"
+checksum=59ead38e81c604ec8107a33fa29db5e0d993abecc1da74c99d1039dd98023b90
+
+do_configure() {
+        export PATH=/usr/bin
+        ./bootstrap
+        ./configure ${configure_args}
+}
+
+do_build() {
+        make
+}
+
+do_install() {
+        make install DESTDIR=${DESTDIR}
+}
+
