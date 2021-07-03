@@ -1,6 +1,6 @@
 # Template file for 'python3-boto3'
 pkgname=python3-boto3
-version=1.17.93
+version=1.17.104
 revision=1
 wrksrc="boto3-${version}"
 build_style=python3-module
@@ -11,7 +11,7 @@ maintainer="Leah Neukirchen <leah@vuxu.org>"
 license="MIT"
 homepage="https://github.com/boto/boto3"
 distfiles="https://github.com/boto/boto3/archive/${version}.tar.gz"
-checksum=3a3af50d74b607c1c19436b3bb4043c6d5791444e22d2435c5e64c3405744148
+checksum=6d95784d86134df8bf55df8993c10f213cdd268d344622fd17e7a145dfcd7575
 
 post_install() {
 	vlicense LICENSE
