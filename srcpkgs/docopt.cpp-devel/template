@@ -1,0 +1,18 @@
+# Template file for 'docopt.cpp-devel'
+pkgname=docopt.cpp-devel
+version=0.6.3
+revision=1
+_commit=42ebcec9dc2c99a1b3a4542787572045763ad196
+wrksrc=docopt.cpp-${_commit}
+build_style=cmake
+hostmakedepends="cmake make gcc"
+short_desc="Create beautiful command-line interfaces"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="Boost-1.0,MIT"
+homepage="https://github.com/docopt/docopt"
+distfiles="https://github.com/docopt/docopt.cpp/archive/${_commit}.tar.gz"
+checksum=c7ac5409c3568123bdd06045b4e38dda75aa9e3f6474838c1e77b971c9ce227e
+
+post_install() {
+	vlicense LICENSE-MIT
+}
