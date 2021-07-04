@@ -1,0 +1,9 @@
+# INSTALL
+case "$ACTION" in
+post)
+	/usr/bin/sed -i -e '/^GRUB_THEME=/d' /etc/default/grub
+	/usr/bin/echo "GRUB_THEME=\"/boot/grub/themes/solarized-light/theme.txt\"" >>/etc/default/grub
+	/usr/bin/update-grub
+	;;
+esac
+

@@ -1,0 +1,8 @@
+# REMOVE
+case "$ACTION" in
+post)
+	/usr/bin/sed -i -e '/^GRUB_THEME=/d' /etc/default/grub
+	/usr/bin/update-grub
+	;;
+esac
+

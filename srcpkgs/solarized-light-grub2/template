@@ -1,0 +1,23 @@
+# Template file for 'solarized-light-grub2'
+pkgname=solarized-light-grub2
+# Upstream project not versioned
+version=1.0
+revision=1
+_commit=c71514ba78e42005c9b440eaf6ec5be98e49ee31
+build_style=fetch
+wrksrc=${pkgname}-${_commit}
+hostmakedepends="tar"
+depends="grub"
+short_desc="Solarized Light theme for GRUB2"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="none"
+homepage="https://github.com/Xyr0s1gn/grub2-solarized-light"
+distfiles="https://github.com/Xyr0s1gn/grub2-solarized-light/archive/${_commit}.tar.gz"
+checksum=1361b996d21577b758d8bbaf2696303ae4c797df683c91594f5d60b78f34425c
+
+do_install() {
+	/usr/bin/tar xpzf ${_commit}.tar.gz
+	/usr/bin/install -d -m0750 ${DESTDIR}/boot/grub/themes
+	vcopy grub2-solarized-light-${_commit} boot/grub/themes/solarized-light
+}
+
