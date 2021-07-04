@@ -1,0 +1,26 @@
+# Template file for 'tutanota'
+pkgname=tutanota
+version=3.82.0
+revision=1
+wrksrc=${pkgname}-${pkgname}-release-${version}
+hostmakedepends="nodejs tar git python3"
+makedepends="libsecret-devel"
+short_desc="Secure email for everybody"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="GPL-3.0"
+homepage="https://tutanota.com/"
+distfiles="https://github.com/tutao/tutanota/archive/${pkgname}-release-${version}.tar.gz"
+checksum=
+
+do_build() {
+	/usr/bin/npm install
+	/usr/bin/node dist --custom-desktop-release --unpacked
+}
+
+do_install() {
+	vmkdir opt
+	vmkdir usr/bin
+	vcopy build/desktop/linux-unpacked opt/tutanota
+	ln -s /opt/tutanota/tutanota-desktop ${DESTDIR}/usr/bin/tutanota
+}
+
