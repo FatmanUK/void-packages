@@ -1,0 +1,29 @@
+# Template file for 'realmd'
+pkgname=realmd
+version=0.16.3
+revision=6
+_commit=517fa766782421302da827278ca17e6b2ad57da3
+wrksrc=realmd-${_commit}
+build_style=gnu-configure
+hostmakedepends="autoconf automake gettext intltool libxslt pkg-config xmlto"
+makedepends="gettext-devel glib-devel libglib-devel polkit-devel mit-krb5-devel"
+depends="dbus polkit"
+short_desc="DBus service for configuring kerberos and other online identities"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="LGPL-2.1"
+homepage="https://www.freedesktop.org/software/realmd"
+distfiles="https://gitlab.freedesktop.org/realmd/realmd/-/archive/${_commit}/realmd-${_commit}.tar.gz"
+checksum=5d19d338dd85af761cb1ff5a0b855341d3f9f6d27a330da98f67963d564bbf8b
+
+do_configure() {
+	autoreconf -fiv
+	intltoolize --force
+	./configure --prefix=/usr --sbindir=/usr/bin --with-distro=suse --without-systemd-unit-dir --without-systemd-journal
+}
+
+post_install() {
+	vconf ${FILESDIR}/realmd.conf
+	# file in wrong place
+	vinstall dbus/org.freedesktop.realmd.conf 0644 etc/dbus-1/system.d
+	rm ${DESTDIR}/usr/etc/dbus-1/system.d/org.freedesktop.realmd.conf
+}
