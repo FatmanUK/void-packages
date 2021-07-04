@@ -1,0 +1,25 @@
+# Template file for 'mod_auth_gssapi'
+pkgname=mod_auth_gssapi
+version=1.6.3
+revision=1
+_commit=75ac8df55b23e1907cd534d2716937579d6af027
+wrksrc=mod_auth_gssapi-${_commit}
+build_style=gnu-configure
+hostmakedepends="apache autoconf automake bison flex libtool make pkg-config"
+makedepends="apache-devel mit-krb5-devel"
+short_desc="GSSAPI Negotiate module for Apache"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="Unify"
+homepage="https://github.com/modauthgssapi/mod_auth_gssapi/wiki"
+distfiles="https://github.com/modauthgssapi/mod_auth_gssapi/archive/${_commit}.tar.gz"
+checksum=5a75ed6f6b260c11c526b7e09a2c974d4c15140699dbb09a0e26c009742a7c5d
+
+do_configure() {
+	cd "$wrksrc"
+	autoreconf -fi
+	./configure
+}
+
+post_install() {
+	vlicense COPYING
+}
