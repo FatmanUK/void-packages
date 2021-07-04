@@ -1,0 +1,18 @@
+# Template file for 'libsqrl'
+pkgname=libsqrl
+version=18.4.7
+revision=1
+_commit=135f6ba6d5bd4983dbc10689e677500f3a875a14
+wrksrc=libsqrl-${_commit}
+build_style=cmake
+hostmakedepends="git"
+short_desc="Library implementing the SQRL Specification"
+maintainer="Adam J. Richardson <fatman.uk@gmail.com>"
+license="MIT"
+homepage="https://sqrlid.com/libsqrl"
+distfiles="https://github.com/Novators/libsqrl/archive/${_commit}.tar.gz"
+checksum=f945a1bdeaa094f0cf402e20295501d4120bb4c976c71dc12a889b6b5ad7688b
+
+post_install() {
+	vlicense LICENSE
+}
